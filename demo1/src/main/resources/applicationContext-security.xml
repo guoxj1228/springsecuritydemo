@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
+<!--第一版本：使用springsecurity默认的配置 
+
+      配置请求拦截规则
+      <security:http use-expressions="false">
+        配置拦截的请求URL,通过什么角色或权限访问
+        <security:intercept-url pattern="/**" access="ROLE_USER"/>
+        配置开启表单登录
+        <security:form-login/>
+    </security:http> -->
+  
+  <!-- 配置哪些请求地址不需要拦截 -->
+  <security:http pattern="/login.html" security="none"/>
+  <security:http pattern="/demo1/login.html" security="none"/>
+	<security:http pattern="/login_error.html" security="none"/>
+  <!-- 配置请求拦截规则 use-expressions: 是否用SpEL表达式 -->
+  <security:http use-expressions="false">
+    <!-- 配置拦截的请求URL，通过什么角色或权限访问 -->
+    <security:intercept-url pattern="/**" access="ROLE_USER"/>
+    
+    <!--session配置  -->
+	<!-- <security:session-management invalid-session-url="/login.html" >
+		<security:concurrency-control max-sessions="1" />
+	</security:session-management> -->
+
+
+	    <security:form-login  login-page="/login.html"
+	    authentication-success-forward-url="/login_success.html" 
+	    authentication-failure-url="/login_error.html"/>
+    
+    
+    <!-- 配置开启表单登录
+       login-page: 配置自己的登录页面
+       authentication-success-forward-url: 认证成功需要跳转的URL
+       authentication-failure-url: 认证失败需要跳转的URL
+       password-parameter: 密码请求参数名称
+       username-parameter: 用户名请求参数名称
+      -->
+    <!-- <security:form-login login-page="/login.html"
+              authentication-success-forward-url="/login_success.html"
+              authentication-failure-url="/login_error.html"
+              password-parameter="password"
+              username-parameter="username"/>-->
+    <!-- 关闭跨站请求伪造CSRF -->
+    <security:csrf disabled="true"/>
+    <security:logout/>
+  </security:http> 
+  
+    <!-- 配置认证管理器 -->
+      <!-- <security:authentication-manager>
+        配置认证提供者
+        <security:authentication-provider>
+            配置用户服务
+            <security:user-service>
+                认证用户信息: 用户名、密码、角色或权限
+                <security:user name="admin" password="123456" authorities="ROLE_USER"/>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager> -->
+    
+    <security:authentication-manager>
+    <security:authentication-provider user-service-ref='myUserDetailsService'/>
+  </security:authentication-manager>
+
+  <bean id="myUserDetailsService"
+        class="com.xc.MyUserDetailsServiceImpl">
+   <!--  <property name="dataSource" ref="dataSource"/> -->
+  </bean>
+  
+  
+</beans>
